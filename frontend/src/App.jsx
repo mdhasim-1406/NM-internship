@@ -70,10 +70,19 @@ function App() {
     }
   };
 
-  const handleEdit = (person) => {
-    setEditingId(person.id);
-    setFormData({ name: person.name, email: person.email });
-    setMessage(`Editing person ID: ${person.id} (Preparing PUT)`);
+  // GET (by id) - Fetch a single person for editing
+  const handleEdit = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}`);
+      if (response.ok) {
+        const person = await response.json();
+        setEditingId(person.id);
+        setFormData({ name: person.name, email: person.email });
+        setMessage(`Fetched details for ID: ${person.id} (GET by ID) - Ready to Update (PUT)`);
+      }
+    } catch (error) {
+      console.error('Error fetching person details:', error);
+    }
   };
 
   return (
@@ -101,7 +110,7 @@ function App() {
             required
           />
           <button type="submit" className={editingId ? 'btn-update' : 'btn-add'}>
-            {editingId ? 'Update Person' : 'Add Person'}
+            {editingId ? 'Update Person (PUT)' : 'Add Person (POST)'}
           </button>
           {editingId && (
             <button type="button" onClick={() => { setEditingId(null); setFormData({ name: '', email: '' }); }}>
@@ -112,7 +121,7 @@ function App() {
       </div>
 
       <div className="list-section">
-        <h2>People List (GET)</h2>
+        <h2>People List (GET All)</h2>
         <table>
           <thead>
             <tr>
@@ -129,8 +138,8 @@ function App() {
                 <td>{person.name}</td>
                 <td>{person.email}</td>
                 <td>
-                  <button className="btn-edit" onClick={() => handleEdit(person)}>Edit</button>
-                  <button className="btn-delete" onClick={() => handleDelete(person.id)}>Delete</button>
+                  <button className="btn-edit" onClick={() => handleEdit(person.id)}>Edit (GET by ID)</button>
+                  <button className="btn-delete" onClick={() => handleDelete(person.id)}>Delete (DELETE)</button>
                 </td>
               </tr>
             ))}
